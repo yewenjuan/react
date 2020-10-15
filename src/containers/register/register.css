@@ -1,0 +1,7 @@
+.am-navbar,
+.am-button-primary {
+  background-color: #009f7f;
+}
+.am-button-primary.am-button-active {
+  background-color: #009f7f;
+}
