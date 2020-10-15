@@ -40,13 +40,19 @@ function userList(state=initUserList, action) {
 // 聊天消息列表
 const initChat = {
   users: {},
-  chatMsgs: []
+  chatMsgs: [],
+  unReadCount: 0 // 未读消息总数
 }
 
 function chat(state=initChat, action) {
   switch(action.type) {
     case RECEIVE_CHAT_LIST:
-      return action.data.users
+      const {users, chatMsgs} = action.data;
+      return {
+        users,
+        chatMsgs,
+        unReadCount: 0
+      }
     case RECEIVE_CHAT:
       return action.data.chatMsgs
     default:

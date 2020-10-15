@@ -104,6 +104,8 @@ export const getUserInfo = () => {
 
 // 根据不同用户类型获取不同用户列表信息
 export const getUserList = (type) => {
+  // 用户登录初始化io，不能在点击发送按钮的时候初始化，时机不对
+  initIO ();
   // 异步调用ajax请求
   return async dispatch => {
     const response = await reqUserList(type);
@@ -143,7 +145,7 @@ async function getMsgList(dispatch) {
 export const sendMsg = ({from, to, content}) => {
   return dispatch => {
     // console.log("发送消息",{from, to, content});
-    initIO ();
+    
     // 发送消息
     io.socket.emit("sendMsg", {from, to, content})
   }
