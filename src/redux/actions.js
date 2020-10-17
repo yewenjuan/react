@@ -1,7 +1,7 @@
 // 包含n个action creator
 // 异步action和同步action 如果是同步的返回对象 如果是异步的返回函数
 import { reqRegister, reqLogin,reqUpdate, reqUser,reqUserList,reqChatMsgList,reqReadMsg } from "../api/index.js";
-import { AUTH_SUCCESS, ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST, RECEIVE_CHAT_LIST} from "./action-types";
+import { AUTH_SUCCESS, ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST, RECEIVE_CHAT_LIST, RECEIVE_CHAT} from "./action-types";
 import io from "socket.io-client";
 
 // 成功的同步分发
@@ -15,7 +15,9 @@ export const resetUser = (msg) => ({type:RESET_USER,data:msg});
 // 获取用户信息列表（同步）
 const userList = (userList) => ({type: RECEIVE_USER_LIST, data: userList});
 // 获取所有聊天列表
-const receiveChatList = ({users, chatMsgs}) => ({type: RECEIVE_CHAT_LIST,data: {users, chatMsgs} })
+const receiveChatList = ({users, chatMsgs}) => ({type: RECEIVE_CHAT_LIST,data: {users, chatMsgs} });
+// 接受一个消息的同步action
+const receiveMsg = (chatMsg) => ({type:RECEIVE_CHAT, data: chatMsg})
 
 // 注册成功
 export const register = (user) => {
@@ -34,7 +36,7 @@ export const register = (user) => {
     const result = response.data; // 得到的是{code:1/0,data:'',msg:''}
     // 成功的注册
     if (result.code === 0) {
-      getMsgList(dispatch);
+      getMsgList(dispatch, result.data._id);
       // 此时需要分发
       dispatch(authSuccess(result.data));
     } else {
@@ -61,7 +63,7 @@ export const login = (user) => {
     const result = response.data;
     // 成功的登陆
     if (result.code === 0) {
-      getMsgList(dispatch);
+      getMsgList(dispatch, result.data._id);
       // 此时需要分发
       dispatch(authSuccess(result.data));
     } else {
@@ -94,7 +96,7 @@ export const getUserInfo = () => {
     let response = await reqUser();
     let result = response.data;
     if(result.code === 0) {
-      getMsgList(dispatch);
+      getMsgList(dispatch, result.data._id);
       dispatch(updateUser(result.data))
     }else {
       dispatch(resetUser(result.msg))
@@ -103,9 +105,7 @@ export const getUserInfo = () => {
 }
 
 // 根据不同用户类型获取不同用户列表信息
-export const getUserList = (type) => {
-  // 用户登录初始化io，不能在点击发送按钮的时候初始化，时机不对
-  initIO ();
+export const getUserList = (type) => {  
   // 异步调用ajax请求
   return async dispatch => {
     const response = await reqUserList(type);
@@ -118,18 +118,24 @@ export const getUserList = (type) => {
 }
 
 // 实时通信初始化io 
-function initIO () {
+function initIO (dispatch, userid) {
   // io连接服务器只需要一次
   if(!io.socket) {
     io.socket = io("ws://localhost:4000");
     // 绑定receiveMsg监听 得到服务器端发送过来的消息
     io.socket.on("receiveMsg", function(chatMsg) {
       console.log("浏览器接受到的消息" + chatMsg);  
+      // 当有一个与之有关联的聊天
+      if(userid === chatMsg.from || userid === chatMsg.to) {
+        dispatch(receiveMsg(chatMsg))
+      }      
     })
   }
 }
 // 异步获取用户聊天数据
-async function getMsgList(dispatch) {
+async function getMsgList(dispatch, userid) {
+  // 用户登录初始化io，不能在点击发送按钮的时候初始化，时机不对
+  initIO (dispatch, userid);
   // 请求聊天接口
  let response = await reqChatMsgList();
  let result = response.data;

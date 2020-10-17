@@ -54,7 +54,12 @@ function chat(state=initChat, action) {
         unReadCount: 0
       }
     case RECEIVE_CHAT:
-      return action.data.chatMsgs
+      const chatMsg =  action.data;
+      return {
+        users: state.users,
+        chatMsgs: [...state.chatMsgs,chatMsg],
+        unReadCount: 0
+      }
     default:
     return state
   }

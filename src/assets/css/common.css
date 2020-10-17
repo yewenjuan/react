@@ -16,3 +16,6 @@
   padding-right: 15px;
   text-align: right;
 }
+#chat-page .am-grid.am-grid-line {
+  top: calc(100% - 50px);
+}

@@ -6,7 +6,7 @@ import {getUserList} from "../../redux/actions"
 
  class Laoban extends Component {
    componentDidMount() {
-     // 获取大神用户列表 发送ajax请求
+     // 获取老板用户列表 发送ajax请求
      this.props.getUserList("dashen");
    }
   render() {

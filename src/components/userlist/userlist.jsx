@@ -22,7 +22,7 @@ const Body = Card.Body
               <div key={user._id}>
                 <WhiteSpace />
                 <Card onClick={() => this.props.history.push(`/chat/${user._id}`)}>
-                  <Header thumb={require(`../../assets/images/${user.header}.png`)} extra={user.username}/>
+                  <Header thumb={user.header ? require(`../../assets/images/${user.header}.png`) : null} extra={user.username}/>
                   <Body>
                     <div>职位: {user.post}</div>
                     {

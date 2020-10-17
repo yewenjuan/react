@@ -7,7 +7,7 @@ import {getUserList} from "../../redux/actions"
  class Dashen extends Component {
   componentDidMount() {
     // 获取大神用户列表 发送ajax请求
-    this.props.getUserList("dashen");
+    this.props.getUserList("laoban");
   }
  render() {
    return (
