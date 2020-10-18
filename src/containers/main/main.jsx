@@ -68,7 +68,7 @@ class Main extends Component {
     if(!userid) {
       return <Redirect to="/login" />
     }
-    let { user } = this.props;
+    let { user,unReadCount } = this.props;
     // 如果没有_id,为什么返回null，后台数据库返回的是null，保持一致
     if(!user._id) {
       return null;
@@ -108,7 +108,7 @@ class Main extends Component {
         </Switch>
         {/* 底部固定导航 */}
         {
-          currentNav ? <NavFooter navList={navList}/> : null
+          currentNav ? <NavFooter navList={navList} unReadCount={unReadCount}/> : null
         }
       </div>
     );
@@ -116,6 +116,6 @@ class Main extends Component {
 }
 
 export default connect(
-  state => ({user: state.user}),
+  state => ({user: state.user, unReadCount: state.chat.unReadCount}),
   {getUserInfo}
 )(Main);

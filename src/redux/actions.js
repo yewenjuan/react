@@ -15,9 +15,9 @@ export const resetUser = (msg) => ({type:RESET_USER,data:msg});
 // 获取用户信息列表（同步）
 const userList = (userList) => ({type: RECEIVE_USER_LIST, data: userList});
 // 获取所有聊天列表
-const receiveChatList = ({users, chatMsgs}) => ({type: RECEIVE_CHAT_LIST,data: {users, chatMsgs} });
+const receiveChatList = ({users, chatMsgs, userid}) => ({type: RECEIVE_CHAT_LIST,data: {users, chatMsgs, userid} });
 // 接受一个消息的同步action
-const receiveMsg = (chatMsg) => ({type:RECEIVE_CHAT, data: chatMsg})
+const receiveMsg = (chatMsg, userid) => ({type:RECEIVE_CHAT, data: {chatMsg, userid}})
 
 // 注册成功
 export const register = (user) => {
@@ -127,7 +127,7 @@ function initIO (dispatch, userid) {
       console.log("浏览器接受到的消息" + chatMsg);  
       // 当有一个与之有关联的聊天
       if(userid === chatMsg.from || userid === chatMsg.to) {
-        dispatch(receiveMsg(chatMsg))
+        dispatch(receiveMsg(chatMsg, userid))
       }      
     })
   }
@@ -143,7 +143,7 @@ async function getMsgList(dispatch, userid) {
   if(result.code === 0) {
     // 分发同步action
     const {users, chatMsgs} = result.data;
-    dispatch(receiveChatList({users, chatMsgs}));
+    dispatch(receiveChatList({users, chatMsgs,userid}));
   }
 
 }

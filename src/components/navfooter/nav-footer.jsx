@@ -11,7 +11,8 @@ const Item = TabBar.Item;
 
 class NavFooter extends Component {
   static propTypes = {
-    navList: PropTypes.array.isRequired
+    navList: PropTypes.array.isRequired,
+    unReadCount: PropTypes.number.isRequired
   }
 
   render() {
@@ -22,10 +23,13 @@ class NavFooter extends Component {
       <TabBar>
         {
           navList.map((nav) => (
-            <Item key={nav.path} title={nav.text} icon={<div style={{
+            <Item key={nav.path} 
+            title={nav.text} 
+            badge={nav.path === "/message" ?  this.props.unReadCount : 0}
+            icon={<div style={{
               width: '22px',
               height: '22px',
-              background: 'url(https://zos.alipayobjects.com/rmsportal/sifuoDUQdAFKAVcFGROC.svg) center center /  21px 21px no-repeat' }}
+              background: 'url(https://zos.alipayobjects.com/rmsportal/sifuoDUQdAFKAVcFGROC.svg) center center /  21px 21px no-repeat' }}              
             />
             }
             selectedIcon={<div style={{

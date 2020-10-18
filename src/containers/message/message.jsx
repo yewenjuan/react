@@ -5,10 +5,16 @@ const Item = List.Item;
 const Brief = Item.Brief;
 
 // 对chatmsgs进行分组，根据chat_id进行分组
-function getLastMsgs(chatMsgs) {
+function getLastMsgs(chatMsgs, userid) {
   // 用一个容器包含根据chat_Id进行的分组
   let lastMsgObjs = {};
   chatMsgs.forEach(msg => {
+    // 统计未读消息个数
+    if(msg.to === userid && !msg.read) {
+      msg.unReadCount = 1;
+    }else {
+      msg.unReadCount = 0;
+    }
     // 得到聊天的标志id
     let chatid = msg.chat_id;
     // 获取已保存当前用户的lastmsg
@@ -17,10 +23,14 @@ function getLastMsgs(chatMsgs) {
     if(!lastMsg) { // 当前msg就是改分组的最后一个聊天记录
       lastMsgObjs[chatid] = msg;
     }else {
+      // unreadcount=已统计的未读消息+msg里的消息
+      let unReadCount = lastMsg.unReadCount + msg.unReadCount;
       // 如果msg比lastmsg晚，就将msg保存为lastmsg
       if(msg.create_time > lastMsg.create_time) {
         lastMsgObjs[chatid] = msg;
       }
+      // 将unreadcount并保存在最新的lastmsg上
+      lastMsgObjs[chatid].unReadCount = unReadCount;
     }
   })
   // 得到所有lastmsg的数组
@@ -37,7 +47,7 @@ function getLastMsgs(chatMsgs) {
     const {user} = this.props;
     const {users, chatMsgs} = this.props.chat;
     // 对chatmsgs进行分组，根据chat_id进行分组
-    let lastMsgs = getLastMsgs(chatMsgs);
+    let lastMsgs = getLastMsgs(chatMsgs, user._id);
     return (
       <List style={{marginTop: 50,marginBottom: 50}}>
         {
@@ -49,7 +59,7 @@ function getLastMsgs(chatMsgs) {
             return (
               <Item 
                 key={msg._id}
-                extra={<Badge text={0}/>}
+                extra={<Badge text={msg.unReadCount}/>}
                 thumb={targetUser.header ? require(`../../assets/images/${targetUser.header}.png`) : null}
                 arrow="horizontal"
                 onClick={() => this.props.history.push(`/chat/${targetUserId}`)}

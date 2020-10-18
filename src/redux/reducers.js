@@ -47,18 +47,18 @@ const initChat = {
 function chat(state=initChat, action) {
   switch(action.type) {
     case RECEIVE_CHAT_LIST:
-      const {users, chatMsgs} = action.data;
+      let {users, chatMsgs, userid} = action.data;
       return {
         users,
         chatMsgs,
-        unReadCount: 0
+        unReadCount: chatMsgs.reduce((preTotal, msg) => preTotal + (!msg.read&&msg.to===userid ? 1 : 0),0)
       }
     case RECEIVE_CHAT:
-      const chatMsg =  action.data;
+      let {chatMsg} =  action.data;
       return {
         users: state.users,
         chatMsgs: [...state.chatMsgs,chatMsg],
-        unReadCount: 0
+        unReadCount: state.unReadCount + (!chatMsg.read&&chatMsg.to===action.data.userid ? 1 : 0)
       }
     default:
     return state
