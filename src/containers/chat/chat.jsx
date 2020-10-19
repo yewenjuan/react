@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
 import {NavBar, List, InputItem,Grid,Icon} from "antd-mobile";
-import {sendMsg} from "../../redux/actions"
+import QueueAnim from "rc-queue-anim";
+
+import {sendMsg, readMsg} from "../../redux/actions"
 const Item = List.Item
 
 class Chat extends Component {  
@@ -23,10 +25,19 @@ class Chat extends Component {
    componentDidMount() {
      // 初始化显示
      window.scrollTo(0, document.body.scrollHeight);
+     // 发请求更新未读消息的数量
+    
    }
    // 更新列表显示聊天记录在下面
    componentDidUpdate() {
     window.scrollTo(0, document.body.scrollHeight);
+   }
+   componentWillUnmount() {
+      //  获取目标用户发送的消息
+      let from = this.props.match.params.userid;
+      // 我自己的id
+      let to = this.props.user._id; 
+      this.props.readMsg(from, to);
    }
   // 发送消息
   send = () => {
@@ -84,23 +95,25 @@ class Chat extends Component {
           {users[targetId].username}
         </NavBar>
         <List style={{marginTop: 50, marginBottom: 50}}>
-          {
-            msgs.map(msg => {
-              if(targetId === msg.from) {
-                return (
-                  <Item key={msg._id} thumb={targetIcon}>
-                  {msg.content}
-                </Item>
-                )
-              }else {
-                return (
-                  <Item key={msg._id} className="chat-me" extra='我'>
-                    {msg.content}
-                  </Item>
-                )
-              }
-            })
-          }         
+          <QueueAnim type="left" delay={100}>
+            {
+              msgs.map(msg => {
+                if(targetId === msg.from) {
+                  return (
+                    <Item key={msg._id} thumb={targetIcon}>
+                      {msg.content}
+                    </Item>
+                  )
+                }else {
+                  return (
+                    <Item key={msg._id} className="chat-me" extra='我'>
+                      {msg.content}
+                    </Item>
+                  )
+                }
+              })
+            }         
+          </QueueAnim>          
         </List>
         <div className="am-tab-bar">
           <InputItem placeholder="请输入" extra={
@@ -128,5 +141,5 @@ class Chat extends Component {
 
 export default connect(
   state => ({user: state.user,chat: state.chat}),
-  {sendMsg}
+  {sendMsg, readMsg}
 )(Chat);

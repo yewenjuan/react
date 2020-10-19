@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from "prop-types";
 import {WingBlank,Card,WhiteSpace} from "antd-mobile";
 import {withRouter} from "react-router-dom";
+import QueueAnim from "rc-queue-anim";
 
 import "./userlist.css";
 
@@ -17,6 +18,7 @@ const Body = Card.Body
     return (
       
         <WingBlank style={{marginBottom: 50,marginTop: 45}}>
+          <QueueAnim type="scale">
           {
             userList.map((user) => (
               <div key={user._id}>
@@ -37,8 +39,9 @@ const Body = Card.Body
                 </Card>          
               </div>
             ))
-          }
-        
+          }        
+          </QueueAnim>
+          
       </WingBlank>
       
     )

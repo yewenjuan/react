@@ -1,6 +1,15 @@
 // 包含多个reducer函数 用来接收老的state和action 返回新的state
 import { combineReducers } from "redux";
-import { AUTH_SUCCESS, ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_CHAT_LIST,RECEIVE_CHAT} from "./action-types";
+import { 
+  AUTH_SUCCESS, 
+  ERROR_MSG,
+  RECEIVE_USER,
+  RESET_USER,
+  RECEIVE_USER_LIST,
+  RECEIVE_CHAT_LIST,
+  RECEIVE_CHAT,
+  MSG_READ
+} from "./action-types";
 import { getRedirectTo } from "../utils/index.js";
 
 // 用来管理用户
@@ -60,8 +69,22 @@ function chat(state=initChat, action) {
         chatMsgs: [...state.chatMsgs,chatMsg],
         unReadCount: state.unReadCount + (!chatMsg.read&&chatMsg.to===action.data.userid ? 1 : 0)
       }
+    case MSG_READ:
+      let {count, from, to} = action.data;
+      console.log(action.data);
+      return {
+        users: state.users,
+        chatMsgs: state.chatMsgs.map(msg => {
+          if(msg.from === from && msg.to === to && !msg.read) { // 需要更新
+            return {...msg, read: true}
+          }else { // 不需要更新
+            return msg
+          }
+        }),
+        unReadCount: state.unReadCount - count
+      }
     default:
-    return state
+      return state
   }
 }
 export default combineReducers({

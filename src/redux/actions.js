@@ -1,7 +1,7 @@
 // 包含n个action creator
 // 异步action和同步action 如果是同步的返回对象 如果是异步的返回函数
 import { reqRegister, reqLogin,reqUpdate, reqUser,reqUserList,reqChatMsgList,reqReadMsg } from "../api/index.js";
-import { AUTH_SUCCESS, ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST, RECEIVE_CHAT_LIST, RECEIVE_CHAT} from "./action-types";
+import { AUTH_SUCCESS, ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST, RECEIVE_CHAT_LIST, RECEIVE_CHAT,MSG_READ} from "./action-types";
 import io from "socket.io-client";
 
 // 成功的同步分发
@@ -17,7 +17,9 @@ const userList = (userList) => ({type: RECEIVE_USER_LIST, data: userList});
 // 获取所有聊天列表
 const receiveChatList = ({users, chatMsgs, userid}) => ({type: RECEIVE_CHAT_LIST,data: {users, chatMsgs, userid} });
 // 接受一个消息的同步action
-const receiveMsg = (chatMsg, userid) => ({type:RECEIVE_CHAT, data: {chatMsg, userid}})
+const receiveMsg = (chatMsg, userid) => ({type:RECEIVE_CHAT, data: {chatMsg, userid}});
+// 读取某个聊天消息的同步action
+const msgRead = (count, from, to) => ({type:MSG_READ, data: {count, from, to}})
 
 // 注册成功
 export const register = (user) => {
@@ -157,3 +159,16 @@ export const sendMsg = ({from, to, content}) => {
   }
 }
 
+// 异步读取用户消息
+export const readMsg = (from, to) => {
+  return async dispatch => {
+    // 发起请求
+    const response = await reqReadMsg(from);
+    const result = response.data;
+    if(result.code === 0) {
+      const count = result.data;
+      dispatch(msgRead(count, from, to))
+    }
+  }
+}
+ 

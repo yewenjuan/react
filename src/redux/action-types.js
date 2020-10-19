@@ -12,4 +12,6 @@ export const RECEIVE_USER_LIST = "receive_user_list";
 // 所有聊天信息列表
 export const RECEIVE_CHAT_LIST = "receive_chat_list";
 // 接受一条消息
-export const RECEIVE_CHAT = "receive_chat"
+export const RECEIVE_CHAT = "receive_chat";
+// 某个聊天消息已读
+export const MSG_READ = "msg_read"; 
